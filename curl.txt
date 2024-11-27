@@ -1,0 +1,1 @@
+curl -X POST -u rete\username:passwd --url http://10.194.137.36/ACCESSIDC/ReportGiornaliero.aspx --insecure --data @body.txt
