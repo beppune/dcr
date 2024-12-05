@@ -32,6 +32,16 @@ fn main() -> Result<(), ureq::Error> {
             .action(ArgAction::Set)
             .ignore_case(true)
             .required(false)
+            .help("Override username from environment")
+        )
+        .arg(
+            Arg::new("dump")
+            .short('d')
+            .long("dump")
+            .default_value("response.html")
+            .action(ArgAction::Set)
+            .required(false)
+            .help("Dump html response in specified file (default name: response.html)")
         );
 
     let matches = cmd.get_matches();
@@ -46,7 +56,10 @@ fn main() -> Result<(), ureq::Error> {
         }
     }
 
-    get_report(username.as_str(), &password)
+    let dump = matches.get_one::<String>("dump")
+        .expect("Expected to have default and not to fail");
+
+    get_report(username.as_str(), &password, Some(dump.to_string()))
 }
 
 fn day() -> String {
@@ -54,7 +67,7 @@ fn day() -> String {
     "24%2F11%2F2024".to_string()
 }
 
-fn get_report(username:&str, password:&str) -> Result<(), ureq::Error> {
+fn get_report(username:&str, password:&str, dump:Option<String>) -> Result<(), ureq::Error> {
 
     let mut basic_auth = format!( "rete\\{}:{}", username, password );
     basic_auth = format!("Basic {}", simple_base64::encode(basic_auth) );
@@ -75,9 +88,13 @@ fn get_report(username:&str, password:&str) -> Result<(), ureq::Error> {
     }
 
     let resp = res.expect("Response");
-    let mut f = File::create("resp.html").unwrap();
     let content = resp.into_string()?;
-    f.write( content.as_bytes() ).unwrap();
+
+    if let Some(name) = dump {
+        let mut f = File::create(name).unwrap();
+        f.write( content.as_bytes() ).unwrap();
+    }
+
 
     let table_selector = Selector::parse("#ADC_ContenutoSpecificoPagina_gvGiornaliero > tbody tr")
         .expect("Selector Error");
