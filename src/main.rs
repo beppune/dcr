@@ -7,6 +7,20 @@ use scraper::Selector;
 
 fn main() -> Result<(), ureq::Error> {
 
+    let mut username = String::new();
+    print!("Username: ");
+    std::io::stdin()
+        .read_line(&mut username)
+        .unwrap();
+
+    let password = rpassword::prompt_password("Password: ")
+        .unwrap();
+    
+    get_report()
+}
+
+fn get_report() -> Result<(), ureq::Error> {
+
     let body = File::open("body.txt").unwrap();
 
     let res = ureq::post("http://10.194.137.36/ACCESSIDC/ReportGiornaliero.aspx")
