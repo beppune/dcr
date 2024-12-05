@@ -5,26 +5,54 @@ use std::io::Write;
 use scraper::Html;
 use scraper::Selector;
 
+use clap::{Command, Arg, ArgAction};
+
 fn main() -> Result<(), ureq::Error> {
 
-    let mut username = String::new();
-    print!("Username: ");
+    let mut username:String = String::from("");
+
+    if let Ok(u) = std::env::var("USERNAME") {
+        username = u.clone();
+    }
+
+    if let Ok(u) = std::env::var("USER") {
+        username = u.clone();
+    }
+
     let _ = std::io::stdout().flush();
-    std::io::stdin()
-        .read_line(&mut username)
-        .unwrap();
 
     let password = rpassword::prompt_password("Password: ")
         .unwrap();
 
-    get_report(username.to_string().trim(), &password)
+    let cmd = Command::new("dcr")
+        .arg(
+            Arg::new("username")
+            .short('u')
+            .long("username")
+            .action(ArgAction::Set)
+            .ignore_case(true)
+            .required(false)
+        );
+
+    let matches = cmd.get_matches();
+
+    if username.len() == 0 {
+
+        if let Some(uname) = matches.get_one::<String>("username") {
+            username = uname.to_string();
+        } else {
+            println!("Username option (-u,--username) is mandatory");
+            std::process::exit(1);
+        }
+    }
+
+    get_report(username.as_str(), &password)
 }
 
 fn get_report(username:&str, password:&str) -> Result<(), ureq::Error> {
 
     let mut basic_auth = format!( "rete\\{}:{}", username, password );
     basic_auth = format!("Basic {}", simple_base64::encode(basic_auth) );
-    dbg!(&basic_auth);
 
     let body = File::open("body.txt").unwrap();
 
