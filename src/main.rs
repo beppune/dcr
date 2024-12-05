@@ -22,9 +22,7 @@ fn main() -> Result<(), ureq::Error> {
         std::process::exit(1);
     }
 
-    let resp = res.unwrap();
-    println!("{}", resp.status_text());
-
+    let resp = res.expect("Response");
     let mut f = File::create("resp.html").unwrap();
     let content = resp.into_string()?;
     f.write( content.as_bytes() ).unwrap();
@@ -39,14 +37,12 @@ fn main() -> Result<(), ureq::Error> {
     let _ = rows.next();
 
     for node in rows {
-        //println!("{:?}", node.html());
-        let text = node.text();
+        let text:Vec<&str> = node.text()
+            .filter(|s| !s.starts_with("\n") )
+            .collect();
         for t in text {
-
-            if ! t.starts_with("\n") {
-                print!("{} |", t);
-                println!();
-            }
+            print!("{} |", t);
+            println!();
         }
 
         break;
