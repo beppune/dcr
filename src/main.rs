@@ -49,9 +49,9 @@ fn main() -> Result<(), ureq::Error> {
     get_report(username.as_str(), &password)
 }
 
-fn day() {
+fn day() -> String {
     //dd%2FDD%2Fyyyy
-    "24%2F11%2F2024"
+    "24%2F11%2F2024".to_string()
 }
 
 fn get_report(username:&str, password:&str) -> Result<(), ureq::Error> {
