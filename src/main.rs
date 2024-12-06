@@ -21,9 +21,6 @@ fn main() -> Result<(), ureq::Error> {
 
     let _ = std::io::stdout().flush();
 
-    let password = rpassword::prompt_password("Password: ")
-        .unwrap();
-
     let cmd = Command::new("dcr")
         .arg(
             Arg::new("username")
@@ -32,7 +29,7 @@ fn main() -> Result<(), ureq::Error> {
             .action(ArgAction::Set)
             .ignore_case(true)
             .required(false)
-            .help("Override username from environment")
+            .help("Override username from environment variables")
         )
         .arg(
             Arg::new("dump")
@@ -57,6 +54,9 @@ fn main() -> Result<(), ureq::Error> {
             std::process::exit(1);
         }
     }
+
+    let password = rpassword::prompt_password("Password: ")
+        .unwrap();
 
     let dump = matches.get_one::<String>("dump")
         .expect("Expected to have default and not to fail");
