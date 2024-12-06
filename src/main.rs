@@ -39,6 +39,8 @@ fn main() -> Result<(), ureq::Error> {
             .short('d')
             .long("dump")
             .default_value("response.html")
+            .default_missing_value("response.html")
+            .num_args(0..=1)
             .action(ArgAction::Set)
             .required(false)
             .help("Dump html response in specified file (default name: response.html)")
